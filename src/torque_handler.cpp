@@ -30,7 +30,7 @@ TorqueHandler::TorqueHandler(const char* canInterface){
         this->myMotors[i] = new ODriveWrapper(this->myController, MotorIDs[i], MotorDirs[i]);
         #endif
 
-        
+        printf("Init motor %i %i %i\n",i, MotorIDs[i], MotorDirs[i]);
         //Some modes require advanced filtering for their input
         // Set up a Mathematical Contoller for each motor, we switch between linear or PID given library config
 
@@ -45,6 +45,8 @@ TorqueHandler::TorqueHandler(const char* canInterface){
     //Default config
     this->actionFlag = MotorAction::CONTROL_LOOP;
     this->mode = TorqueDriveMode::UNLOCKED_VELOCITY;
+    
+    printf("Ready\n");
 
     //Start the control thread
     this->loopControlFlag = 1;
@@ -126,7 +128,7 @@ void TorqueHandler::controlLoop(){
 
 //This function is called by the main control loop and handles the torque distribution between wheels
 void TorqueHandler::handlePID(){
-    printf("PID loop\n");
+    //printf("PID loop\n");
     switch (this->mode){
         //Unlocked Velocity mode just uses the inbuild velocity loop on the ODrives
         case TorqueDriveMode::UNLOCKED_VELOCITY:
@@ -158,7 +160,7 @@ void TorqueHandler::handlePID(){
                 leftVel = myMotors[leftMotorIndex]->getSpeed();
                 rightVel = myMotors[rightMotorIndex]->getSpeed();
 
-                printf("Speed %f %f Target %f %f\n",leftVel,rightVel,this->leftSpeed, this->rightSpeed);
+                //printf("Speed %f %f Target %f %f\n",leftVel,rightVel,this->leftSpeed, this->rightSpeed);
 
                 //Update the Math Models
                 //First the setpoints
@@ -225,12 +227,12 @@ void TorqueHandler::handlePID(){
                     leftSpeedsScaled[i] = abs(1 * myMotors[LeftMotorIndexes[i]]->getSpeed());
                     rightSpeedsScaled[i] = abs(leftRightScaleFactor * myMotors[RightMotorIndexes[i]]->getSpeed());
 
-                    printf("Wheel Pair Initial: %f %f Scaled %f %f\n",
+                    /*printf("Wheel Pair Initial: %f %f Scaled %f %f\n",
                         myMotors[LeftMotorIndexes[i]]->getSpeed(),
                         myMotors[RightMotorIndexes[i]]->getSpeed(),
                         leftSpeedsScaled[i],
                         rightSpeedsScaled[i]
-                    );
+                    );*/
                 }
 
 
@@ -244,7 +246,7 @@ void TorqueHandler::handlePID(){
                         slowestSpeed = rightSpeedsScaled[i];
                     }
                 }
-                printf("Slowest: %f\n",slowestSpeed);
+                //printf("Slowest: %f\n",slowestSpeed);
 
                 //Compute the wheel speed average
                 float wheelAverage = 0;
@@ -257,7 +259,7 @@ void TorqueHandler::handlePID(){
                 //Average with target and slowest to produce weighted average that prefers the target speed
                 float weightedAverage = (wheelAverage + slowestSpeed + abs(this->leftSpeed)) / 3.0;
 
-                printf("Computed average: %f\n",weightedAverage);
+                //printf("Computed average: %f\n",weightedAverage);
 
                 //Scale back to left and right
                 double leftNew, rightNew;
@@ -277,7 +279,7 @@ void TorqueHandler::handlePID(){
                 leftNew = leftNew * leftSign;
                 rightNew = rightNew * rightSign;
                 
-                printf("New Speeds: %f %f Target: %f %f\n",leftNew, rightNew, this->leftSpeed, this->rightSpeed);
+                //printf("New Speeds: %f %f Target: %f %f\n",leftNew, rightNew, this->leftSpeed, this->rightSpeed);
 
                 //Write to wheels
                 for (int i = 0; i < MotorsPerSide; i++){

@@ -79,6 +79,12 @@ ODriveController::~ODriveController()
 ODriveState ODriveController::getState(const uint8_t& id) const
 {
     std::lock_guard<std::mutex> lock(m_odrive_states);
+
+    auto it = odrive_states.find(id);
+    if (it == odrive_states.end()) {
+        return ODriveState{};   // all zeros
+    }
+
     return odrive_states.at(id);
 }
 
@@ -210,7 +216,7 @@ bool ODriveController::setVelocity(const uint8_t &id, const float &target_veloci
         std::cerr << "[ODriveController] Error: Tried to setVelocity with invalid CAN socket!\n";
         return false;
     }
-    std::cout << "ID: " << (int)id << "Velocity: " << target_velocity << std::endl;
+    //std::cout << "ID: " << (int)id << "Velocity: " << target_velocity << std::endl;
     // setVelocity command takes:
     // Bytes    Name    Type    Unit
     // 0-3      Vel     float   rev/s
