@@ -12,11 +12,15 @@ Authors:
 * [Electrical] Kaelan Grainger
 
 */
-
-
 TorqueHandler::TorqueHandler(const char* canInterface){
+    //Initialise the communication handlers
     #ifndef TorqueHandler_TestMode
-    this->myController = new ODriveController(canInterface);
+        #ifdef USE_ODrive
+            this->myController = new ODriveController(canInterface);
+        #endif
+        #ifdef USE_MyActuator
+            this->myCan = new WrappedCANBus(canInterface);
+        #endif
     #endif
 
     //Set up all the motors
@@ -25,20 +29,17 @@ TorqueHandler::TorqueHandler(const char* canInterface){
 
         //Handle the test case - if we are in test mode we create a virtual motor, otherwise we create an actual odrive
         #ifdef TorqueHandler_TestMode
-        this->myMotors[i] = new FakeWrapper(MotorIDs[i]);
+            this->myMotors[i] = new FakeWrapper(MotorIDs[i]);
         #else
-        this->myMotors[i] = new ODriveWrapper(this->myController, MotorIDs[i], MotorDirs[i]);
+            #ifdef USE_ODrive
+                this->myMotors[i] = new ODriveWrapper(this->myController, MotorIDs[i], MotorDirs[i]);
+            #endif
+            #ifdef USE_MyActuator
+                this->myMotors[i] = new MyActuatorMotor(this->myCan, MotorIDs[i], MotorDirs[i]);
+            #endif
         #endif
 
         printf("Init motor %i %i %i\n",i, MotorIDs[i], MotorDirs[i]);
-        //Some modes require advanced filtering for their input
-        // Set up a Mathematical Contoller for each motor, we switch between linear or PID given library config
-
-        #ifdef TorqueHandler_LinearMathOrPID
-        this->myModels[i] = new Linear_Calc(TorqueHandler_LinearResponse, TorqueHandler_MinTorque, TorqueHandler_MaxTorque);
-        #else
-        this->myModels[i] = new PID_Calc(TorqueHandler_PID_Kp, TorqueHandler_PID_Ki, TorqueHandler_PID_Kd, TorqueHandler_MinTorque, TorqueHandler_MaxTorque);
-        #endif
         
     }
 
@@ -141,54 +142,6 @@ void TorqueHandler::handlePID(){
 
                 myMotors[leftMotorIndex]->setSpeed(this->leftSpeed);
                 myMotors[rightMotorIndex]->setSpeed(this->rightSpeed);
-            }
-            }
-            break;
-
-        case TorqueDriveMode::UNLOCKED_TORQUE:
-            {
-            //Set the speed on the left and right wheels
-            int leftMotorIndex, rightMotorIndex;
-            double leftVel, rightVel, newLeftTorque, newRightTorque;
-            for (int i = 0; i < MotorsPerSide; i++){
-                leftMotorIndex = LeftMotorIndexes[i];
-                rightMotorIndex = RightMotorIndexes[i];
-
-                
-
-                //Read the current Measured Velocities for each motor pair
-                leftVel = myMotors[leftMotorIndex]->getSpeed();
-                rightVel = myMotors[rightMotorIndex]->getSpeed();
-
-                //printf("Speed %f %f Target %f %f\n",leftVel,rightVel,this->leftSpeed, this->rightSpeed);
-
-                //Update the Math Models
-                //First the setpoints
-                myModels[leftMotorIndex]->set(this->leftSpeed);
-                myModels[rightMotorIndex]->set(this->rightSpeed);
-
-                //Now run the Math
-                newLeftTorque = myModels[leftMotorIndex]->update(leftVel, ControlLoopTimestep);
-                newRightTorque = myModels[rightMotorIndex]->update(rightVel, ControlLoopTimestep);
-
-                //Ensure that it is always the direction we want the wheel to turn
-                if (this->leftSpeed < 0){
-                    newLeftTorque = (newLeftTorque < 0) ? newLeftTorque : 0;
-                }
-                else {
-                    newLeftTorque = (newLeftTorque > 0) ? newLeftTorque : 0;
-                }
-
-                if (this->rightSpeed < 0){
-                    newRightTorque = (newRightTorque < 0) ? newRightTorque : 0;
-                }
-                else {
-                    newRightTorque = (newRightTorque > 0) ? newRightTorque : 0;
-                }
-
-                //Write back
-                myMotors[leftMotorIndex]->setTorque(newLeftTorque);
-                myMotors[rightMotorIndex]->setTorque(newRightTorque);
             }
             }
             break;
@@ -326,12 +279,16 @@ TorqueHandler::~TorqueHandler(){
     for (int i = 0; i < MotorCount; i++){
         printf("Cleanup motor %i\n",i);
         delete this->myMotors[i];
-        delete this->myModels[i];
     }
 
     //Clean up
     #ifndef TorqueHandler_TestMode
-    delete this->myController;
+        #ifdef USE_ODrive
+            delete this->myController;
+        #endif
+        #ifdef USE_MyActuator
+            delete this->myCan;
+        #endif
     #endif
 }
 

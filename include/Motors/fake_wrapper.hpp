@@ -1,5 +1,5 @@
 #pragma once
-#include "motor_wrapper.hpp"
+#include "drive_motor_wrapper.hpp"
 
 /* 
 RMIT Rover
@@ -10,7 +10,7 @@ Authors:
 */
 
 
-class FakeWrapper: public  MotorWrapper {
+class FakeWrapper: public  DriveMotorWrapper {
     private:
         int wheelID;
         float speed;

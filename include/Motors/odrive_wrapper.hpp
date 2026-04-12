@@ -1,6 +1,6 @@
 #pragma once
 #include "odrive_control.hpp"
-#include "motor_wrapper.hpp"
+#include "drive_motor_wrapper.hpp"
 
 /* 
 RMIT Rover
@@ -11,7 +11,7 @@ Authors:
 */
 
 
-class ODriveWrapper: public  MotorWrapper {
+class ODriveWrapper: public DriveMotorWrapper {
     private:
         ODriveController* myCont;
         int wheelID;
