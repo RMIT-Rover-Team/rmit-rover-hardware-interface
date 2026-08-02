@@ -1,3 +1,25 @@
+# Mini Rover Hardware Interface
+Hardware interface for the Research Mini Rover project
+
+## Installation
+The RaspberryPi requires the libgpiod-dev and gpiod packages, to install
+```sh
+sudo apt update && sudo apt upgrade
+sudo apt install gpiod libgpiod-dev
+```
+
+This hardware interface uses the WiringPi library, to install:
+```sh 
+wget https://github.com/WiringPi/WiringPi/releases/download/v3.19/wiringpi_3.19_arm64.deb
+sudo apt install ./wiringpi_3.19_arm64.deb
+```
+## Compiling
+To compile:
+```sh
+g++ -o gpio_test gpio_test.cpp -l wiringPi
+sudo ./gpio_test
+```
+
 # (Websocket)
 To Build:
 ```
@@ -53,7 +75,4 @@ After launch, use the following command for teleop control:
 ```
 ros2 run teleop_twist_keyboard teleop_twist_keyboard -r cmd_vel:=/diff_cont/cmd_vel_unstamped
 ```
-
-
-
 
