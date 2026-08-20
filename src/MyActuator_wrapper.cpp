@@ -80,8 +80,9 @@ float MyActuatorMotor::getPos() {
         //Check if the command matches
         printf("Got %02x\n",(uint8_t)recv.data[0]);
         if ((uint8_t)recv.data[0] == 0x92){
-            break;
+            //break;
         } 
+	break; //Program was getting stuck in this while loop at previous printf requiring estop - Andre 
     }
     
 

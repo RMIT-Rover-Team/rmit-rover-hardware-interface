@@ -38,6 +38,8 @@ int main(int argc, char** argv){
     myHandler->setMode(TorqueDriveMode::UNLOCKED_VELOCITY);
 
     int run = 1;
+    float oleftsp = 0;
+    float orightsp = 0;
     float leftsp = 0;
     float rightsp = 0;
     char c;
@@ -46,6 +48,8 @@ int main(int argc, char** argv){
     while (run){
         c = getchar();
         if (c == 27) { // ESC
+		oleftsp = leftsp;
+		orightsp = rightsp;
             if (getchar() == '[') {
                 switch(getchar()) {
                     case 'A': 
@@ -70,14 +74,18 @@ int main(int argc, char** argv){
                         rightsp += 5;
                         break;
                 }
-                myHandler->setSpeed(leftsp,rightsp);
+		
+		if((oleftsp != leftsp) || (orightsp != rightsp)) {
+                	myHandler->setSpeed(leftsp,rightsp);
+		} // Only sends CAN speed if either side speed has changed from previous - Andre
             }
         }
         else if (c == 'q'){
             run = 0;
         }
         else if (c == ' '){
-            leftsp = 0;
+		std::cout << "SPACEBAR\n";
+	    leftsp = 0;
             rightsp = 0;
             myHandler->setSpeed(leftsp,rightsp);
 
