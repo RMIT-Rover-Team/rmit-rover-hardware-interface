@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++11 -I ../../include/
 
 # Source files
-SRCS = ../../src/fake_wrapper.cpp ../../src/linear_calc.cpp ../../src/torque_handler.cpp ../../src/pid_calc.cpp testTorque.cpp
+SRCS = ../../src/fake_wrapper.cpp ../../src/linear_calc.cpp ../../src/torque_handler.cpp ../../src/pid_calc.cpp testTorque.cpp ../../src/solstice_wrapper.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

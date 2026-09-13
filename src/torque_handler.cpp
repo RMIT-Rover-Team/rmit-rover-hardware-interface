@@ -37,6 +37,9 @@ TorqueHandler::TorqueHandler(const char* canInterface){
             #ifdef USE_MyActuator
                 this->myMotors[i] = new MyActuatorMotor(this->myCan, MotorIDs[i], MotorDirs[i]);
             #endif
+            #ifdef USE_Solstice
+                this->myMotors[i] = new SolsticeWrapper(MotorIDs[i], SolsticeEnablePins[i], SolsticeIN1Pins[i], SolsticeIN2Pins[i]);
+            #endif
         #endif
 
         printf("Init motor %i %i %i\n",i, MotorIDs[i], MotorDirs[i]);

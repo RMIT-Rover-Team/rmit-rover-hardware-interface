@@ -16,10 +16,12 @@ Authors:
 //#define TorqueHandler_TestMode 1
 
 
+
 //Define the type of motor
 #ifndef TorqueHandler_TestMode
 //#define USE_ODrive
-#define USE_MyActuator
+// #define USE_MyActuator
+#define USE_Solstice
 #endif
 
 
@@ -31,6 +33,11 @@ const int LeftMotorIndexes[MotorsPerSide] = {0,1}; //These are indexes of the ab
 const int RightMotorIndexes[MotorsPerSide] = {2,3}; //These are indexes of the above motor IDs
 
 const int MotorDirs[MotorCount] = {-1,1,1,-1};
+#ifdef USE_Solstice
+    const int SolsticeEnablePins[MotorCount] = {21, 20, 4, 3};
+    const int SolsticeIN1Pins[MotorCount] = {12, 19, 18, 15};
+    const int SolsticeIN2Pins[MotorCount] = {13, 16, 17, 14};
+#endif
 
 #define ControlLoopTimestep 0.1
 
@@ -73,6 +80,9 @@ typedef struct
         #include "Motors/MyActuator_wrapper.hpp"
         #include "CanComms/GenericCan.h"
         #include "CanComms/SocketCanWrapper.h"
+    #endif
+    #ifdef USE_Solstice
+        #include "Motors/solstice_wrapper.hpp"
     #endif
     
 #endif
