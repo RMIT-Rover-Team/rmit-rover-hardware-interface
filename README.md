@@ -13,11 +13,36 @@ This hardware interface uses the WiringPi library, to install:
 wget https://github.com/WiringPi/WiringPi/releases/download/v3.19/wiringpi_3.19_arm64.deb
 sudo apt install ./wiringpi_3.19_arm64.deb
 ```
-## Compiling
-To compile:
+
+The Solstice mini-rover drive (`SolsticeWrapper`) uses the lgpio library instead. It's only needed on the Pi that drives Solstice:
 ```sh
-g++ -o gpio_test gpio_test.cpp -l wiringPi
-sudo ./gpio_test
+sudo apt install liblgpio-dev
+```
+If apt can't find it, build from source:
+```sh
+wget https://github.com/joan2937/lg/archive/master.zip
+unzip master.zip && cd lg-master
+make && sudo make install
+```
+Check it's installed: `ls /usr/include/lgpio.h`
+
+## TODO: Compiling
+
+
+# Solstice Mini-Rover (SolsticeWrapper)
+Drive motor wrapper for the Solstice mini-rover: one DRV8952 channel per wheel, open loop.
+- `include/Motors/solstice_wrapper.hpp`, `src/solstice_wrapper.cpp`
+- Pins are BCM numbers (the GPIO numbers on the schematic).
+- Each wheel opens its own lgpio handle in `enable()` and closes it in `disable()`. No setup is needed in `main()`.
+
+**Two build modes:**
+- **Pi (real hardware):** TODO: finish compile notes
+- **Anywhere else (e.g. WSL):** build normally. No lgpio needed; pin actions are printed instead of driving hardware.
+
+To test with the torque handler test:
+```
+cd test/testTorqueHandler
+make -B && ./TestTorque
 ```
 
 # (Websocket)
@@ -75,4 +100,3 @@ After launch, use the following command for teleop control:
 ```
 ros2 run teleop_twist_keyboard teleop_twist_keyboard -r cmd_vel:=/diff_cont/cmd_vel_unstamped
 ```
-
