@@ -25,7 +25,7 @@ TorqueHandler::TorqueHandler(const char* canInterface){
 
     //Set up all the motors
     for (int i = 0; i < MotorCount; i++){
-        printf("Init motor %i\n", MotorIDs[i]);
+        printf("Init motor %i\n",i);
 
         //Handle the test case - if we are in test mode we create a virtual motor, otherwise we create an actual odrive
         #ifdef TorqueHandler_TestMode
@@ -37,9 +37,12 @@ TorqueHandler::TorqueHandler(const char* canInterface){
             #ifdef USE_MyActuator
                 this->myMotors[i] = new MyActuatorMotor(this->myCan, MotorIDs[i], MotorDirs[i]);
             #endif
+            #ifdef USE_GPIO
+                this->myMotors[i] = new GPIOMotorWrapper(GPIO_FWPins[i], GPIO_BWPins[i], GPIO_ENPins[i], MotorDirs[i]);
+            #endif
         #endif
 
-        printf("Init motor %i %i %i\n",i, MotorIDs[i], MotorDirs[i]);
+        printf("Init motor %i  %i\n",i, MotorDirs[i]);
         
     }
 
