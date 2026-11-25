@@ -16,6 +16,11 @@ class GPIOMotorWrapper: public  DriveMotorWrapper {
         int bwPin;
         int enPin;
 
+        double speed;
+        double pos;
+
+        double lastTime;
+
     public:
         //We need to share the controller with other instances
         GPIOMotorWrapper(int fwPin, int bwPin, int enPin, int dir);
