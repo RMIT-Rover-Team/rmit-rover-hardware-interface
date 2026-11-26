@@ -12,6 +12,11 @@ list(REMOVE_ITEM hardwareInterface_SOURCES
 # Build the library
 add_library(hardwareInterface SHARED ${hardwareInterface_SOURCES})
 
+target_link_libraries(hardwareInterface
+    PUBLIC
+        wiringPi
+)
+
 # Public include directory
 target_include_directories(hardwareInterface
     PUBLIC
