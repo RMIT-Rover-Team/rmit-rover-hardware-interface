@@ -16,21 +16,63 @@ Authors:
 //#define TorqueHandler_TestMode 1
 
 
-//Define the type of motor
-#ifndef TorqueHandler_TestMode
-//#define USE_ODrive
-#define USE_MyActuator
+#define RAT_ODRIVE 0
+#define EQUINOX_ODRIVE 1
+#define EQUNIOX_TWO_MYACTUATOR 2
+#define SOLSTICE_MINIROVER 3
+
+#define ROVER_BUILD_TARGET EQUINOX_TWO_MYACTUATOR
+//#define ROVER_BUILD_TARGET SOLSTICE_MINIROVER
+
+// The various configurations
+#if ROVER_BUILD_TARGET == RAT_ODRIVE
+
+    #define USE_ODRIVE
+    #define MotorCount 6
+    #define MotorsPerSide 3
+    const int MotorIDs[MotorCount] = {1,2,3,4,5,6};
+    const int LeftMotorIndexes[MotorsPerSide] = {0,1,2}; //These are indexes of the above motor IDs                    
+    const int RightMotorIndexes[MotorsPerSide] = {3,4,5}; //These are indexes of the above motor IDs                   
+
+    const int MotorDirs[MotorCount] = {-1,-1,-1,1,1,1};
+
+#elif ROVER_BUILD_TARGET == EQUINOX_ODRIVE
+
+    #define USE_ODRIVE
+    #define MotorCount 4
+    #define MotorsPerSide 2
+    const int MotorIDs[MotorCount] = {1,2,3,4};
+    const int LeftMotorIndexes[MotorsPerSide] = {0,1}; //These are indexes of the above motor IDs                                                  
+    const int RightMotorIndexes[MotorsPerSide] = {2,3}; //These are indexes of the above motor IDs                                                 
+
+    const int MotorDirs[MotorCount] = {-1,1,1,-1};
+
+#elif ROVER_BUILD_TARGET == EQUNIOX_TWO_MYACTUATOR
+
+    #define USE_MyActuator
+    #define MotorCount 4
+    #define MotorsPerSide 2
+    const int MotorIDs[MotorCount] = {1,2,3,4};
+    const int LeftMotorIndexes[MotorsPerSide] = {0,1}; //These are indexes of the above motor IDs                                                  
+    const int RightMotorIndexes[MotorsPerSide] = {2,3}; //These are indexes of the above motor IDs                                                 
+
+    const int MotorDirs[MotorCount] = {-1,-1,1,1};
+
+#elif ROVER_BUILD_TARGET == SOLSTICE_MINIROVER
+
+    #define USE_GPIO
+    #define MotorCount 4
+    #define MotorsPerSide 2
+
+    const int LeftMotorIndexes[MotorsPerSide] = {1,2}; //These are indexes of the above motor IDs                                                   
+    const int RightMotorIndexes[MotorsPerSide] = {0,3}; //These are indexes of the above motor IDs                                                 
+    const int GPIO_FWPins[MotorCount] = {15, 18, 13, 19};
+    const int GPIO_BWPins[MotorCount] = {14, 17, 12, 16};
+    const int GPIO_ENPins[MotorCount] = {3,4,21,20};
+
+    const int MotorDirs[MotorCount] = {1,1,-1,-1};
+
 #endif
-
-
-//Motor Definitions
-#define MotorCount 4
-#define MotorsPerSide 2
-const int MotorIDs[MotorCount] = {1,2,3,4};
-const int LeftMotorIndexes[MotorsPerSide] = {0,1}; //These are indexes of the above motor IDs
-const int RightMotorIndexes[MotorsPerSide] = {2,3}; //These are indexes of the above motor IDs
-
-const int MotorDirs[MotorCount] = {-1,-1,1,1};
 
 #define ControlLoopTimestep 0.1
 
@@ -73,6 +115,9 @@ typedef struct
         #include "Motors/MyActuator_wrapper.hpp"
         #include "CanComms/GenericCan.h"
         #include "CanComms/SocketCanWrapper.h"
+    #endif
+    #ifdef USE_GPIO
+        #include "Motors/gpioMotor_wrapper.hpp"
     #endif
     
 #endif
