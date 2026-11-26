@@ -21,7 +21,8 @@ Authors:
 #define EQUNIOX_TWO_MYACTUATOR 2
 #define SOLSTICE_MINIROVER 3
 
-#define ROVER_BUILD_TARGET EQUINOX_TWO_MYACTUATOR
+//#define ROVER_BUILD_TARGET EQUINOX_TWO_MYACTUATOR
+#define ROVER_BUILD_TARGET SOLSTICE_MINIROVER
 
 // The various configurations
 #if ROVER_BUILD_TARGET == RAT_ODRIVE
@@ -63,13 +64,13 @@ Authors:
     #define MotorCount 4
     #define MotorsPerSide 2
 
-    const int LeftMotorIndexes[MotorsPerSide] = {0,1}; //These are indexes of the above motor IDs                                                   
-    const int RightMotorIndexes[MotorsPerSide] = {2,3}; //These are indexes of the above motor IDs                                                 
-    const int GPIO_FWPins[MotorCount] = {26, 27, 0, 15};
-    const int GPIO_BWPins[MotorCount] = {23, 24, 1, 16};
-    const int GPIO_ENPins[] = {2, 29, 28, 7, 9};
+    const int LeftMotorIndexes[MotorsPerSide] = {1,2}; //These are indexes of the above motor IDs                                                   
+    const int RightMotorIndexes[MotorsPerSide] = {0,3}; //These are indexes of the above motor IDs                                                 
+    const int GPIO_FWPins[MotorCount] = {15, 18, 13, 19};
+    const int GPIO_BWPins[MotorCount] = {14, 17, 12, 16};
+    const int GPIO_ENPins[MotorCount] = {3,4,21,20};
 
-    const int MotorDirs[MotorCount] = {-1,-1,1,1};
+    const int MotorDirs[MotorCount] = {1,1,-1,-1};
 
 #endif
 

@@ -27,11 +27,12 @@ GPIOMotorWrapper::GPIOMotorWrapper(int fwPin, int bwPin, int enPin, int dir){
      this->fwPin = fwPin;
      this->bwPin = bwPin;
      this->enPin = enPin;
+     this->dir = dir;
 
      this->speed = 0;
      this->pos = 0;
 
-     if (wiringPiSetup() == -1){
+     if (wiringPiSetupGpio() == -1){
             std::cerr << "Failed to initialize wiringPi\n";
     }
 
@@ -51,27 +52,27 @@ GPIOMotorWrapper::GPIOMotorWrapper(int fwPin, int bwPin, int enPin, int dir){
 
 
 void GPIOMotorWrapper::enable(){
-    printf("Wheel %i Enable\n", this->wheelID);
+    printf("Wheel %i Enable\n", this->fwPin);
     digitalWrite(enPin, HIGH);
 }
 
 void GPIOMotorWrapper::disable(){
-    printf("Wheel %i Disable\n", this->wheelID);
+    printf("Wheel %i Disable\n", this->fwPin);
     digitalWrite(enPin, LOW);
 }
 
 void GPIOMotorWrapper::calibrate(){
-    printf("Wheel %i Calibrate\n", this->wheelID);
+    printf("Wheel %i Calibrate\n", this->fwPin);
 }
 
 void GPIOMotorWrapper::setTorque(float value) {
-    printf("Wheel %i SetTorque %f\n", this->wheelID, value);
+    printf("Wheel %i SetTorque %f\n", this->fwPin, value);
     //make some shit up
     
 }
 
 void GPIOMotorWrapper::setSpeed(float value) {
-    printf("Wheel %i SetVelocity %f\n", this->wheelID, value);
+    printf("Wheel %i SetVelocity %f\n", this->fwPin, value);
     
      //Update the pos with the integral
     
@@ -80,6 +81,8 @@ void GPIOMotorWrapper::setSpeed(float value) {
     this->lastTime = monotonic_ms();
 
     this->speed = value;
+
+    value = value * this->dir;
 
     // Write PWM
     if (value >= 0){
@@ -94,25 +97,25 @@ void GPIOMotorWrapper::setSpeed(float value) {
 }
 
 void GPIOMotorWrapper::clearErrors(){
-    printf("Wheel %i Clear Error\n", this->wheelID);
+    printf("Wheel %i Clear Error\n", this->fwPin);
 }
 
 void GPIOMotorWrapper::estop(){
-    printf("Wheel %i ESTOP\n", this->wheelID);
+    printf("Wheel %i ESTOP\n", this->fwPin);
 }
 
 float GPIOMotorWrapper::getSpeed(){
-    printf("Wheel %i Getspeed %f\n", this->wheelID, this->speed);
+    printf("Wheel %i Getspeed %f\n", this->fwPin, this->speed);
     this->pos += this->speed * ((monotonic_ms() - this->lastTime) / 1000);
 
     this->lastTime = monotonic_ms();
-    return this->speed;
+    return this->speed * this->dir;
 }
 
 float GPIOMotorWrapper::getPos(){
-    printf("Wheel %i Getpos %f\n", this->wheelID, this->pos);
+    printf("Wheel %i Getpos %f\n", this->fwPin, this->pos);
     this->pos += this->speed * ((monotonic_ms() - this->lastTime) / 1000);
 
     this->lastTime = monotonic_ms();
-    return this->pos;
+    return this->pos * this->dir;
 }

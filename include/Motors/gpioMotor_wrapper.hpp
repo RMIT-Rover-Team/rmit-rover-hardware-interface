@@ -15,6 +15,7 @@ class GPIOMotorWrapper: public  DriveMotorWrapper {
         int fwPin;
         int bwPin;
         int enPin;
+        int dir;
 
         double speed;
         double pos;
